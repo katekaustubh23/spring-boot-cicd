@@ -1,23 +1,28 @@
-# Use a base image with Java
-FROM eclipse-temurin:17-jre-jammy AS build
-# Make the source directory in the image
+# =========================
+# Build stage
+# =========================
+FROM maven:3.9.6-eclipse-temurin-17 AS build
+
 WORKDIR /app
-# Copy the Maven project files
-COPY mvnw .
-COPY .mvn .mvn
 COPY pom.xml .
-# Copy the source code
-COPY src src
+RUN mvn dependency:go-offline
 
-# Build the application
-# Use -DskipTests to speed up the image build, tests will run in Jenkins
-RUN ./mvnw clean package -DskipTests
+# Copy source code
+COPY src ./src
+RUN mvn clean package -DskipTests
 
-# Final stage/Runtime image
+# =========================
+# Runtime stage
+# =========================
 FROM eclipse-temurin:17-jre-jammy
-# Expose the port your Spring Boot app runs on (default 8080)
-EXPOSE 8088
-# Copy the built JAR file from the 'build' stage
+
+WORKDIR /app
+
+# Expose Spring Boot port
+EXPOSE 8080
+
+# Copy jar from build stage
 COPY --from=build /app/target/*.jar app.jar
-# Run the application
-ENTRYPOINT ["java","-jar","/app.jar"]
+
+# Run application
+ENTRYPOINT ["java", "-jar", "app.jar"]
