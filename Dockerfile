@@ -1,5 +1,5 @@
 # Use a base image with Java
-FROM openjdk:17-jdk-slim AS build
+FROM eclipse-temurin:17-jre-jammy AS build
 # Make the source directory in the image
 WORKDIR /app
 # Copy the Maven project files
@@ -14,7 +14,7 @@ COPY src src
 RUN ./mvnw clean package -DskipTests
 
 # Final stage/Runtime image
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jre-jammy
 # Expose the port your Spring Boot app runs on (default 8080)
 EXPOSE 8088
 # Copy the built JAR file from the 'build' stage
