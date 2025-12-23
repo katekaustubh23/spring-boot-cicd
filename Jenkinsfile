@@ -12,6 +12,7 @@ pipeline {
             steps {
                 // The pipeline automatically checks out the code from the Git repository
                 echo 'Checking out code from SCM...'
+				checkout scm
             }
         }
         stage('Build & Test') {
@@ -22,12 +23,8 @@ pipeline {
         }
         stage('Build Docker Image') {
             steps {
-                // Build the Docker image using the Dockerfile
-                // -t tags the image (e.g., spring-boot-app:latest)
-                script {
-                    def appImage = docker.build("spring-boot-app:latest")
-                    echo "Docker image built: ${appImage.id}"
-                }
+               echo 'Building Docker image...'
+               sh 'docker build -t spring-boot-app:latest .'
             }
         }
         stage('Deploy Local Docker') {
@@ -40,7 +37,12 @@ pipeline {
 
                     echo 'Running new container...'
                     // Run the new image, mapping the host port 8081 to the container port 8080
-                    sh 'docker run -d -p 8081:8080 --name spring-boot-container spring-boot-app:latest'
+                    sh '''
+						docker run -d 
+						-p 8081:8080 
+						--name spring-boot-container 
+						spring-boot-app:latest
+					'''
                 }
             }
         }
