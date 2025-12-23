@@ -38,10 +38,7 @@ pipeline {
                     echo 'Running new container...'
                     // Run the new image, mapping the host port 8081 to the container port 8080
                     sh '''
-						docker run -d 
-						-p 8081:8080 
-						--name spring-boot-container 
-						spring-boot-app:latest
+						docker run -d -p 8081:8080 --name spring-boot-container spring-boot-app:latest
 					'''
                 }
             }
